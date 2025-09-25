@@ -142,4 +142,48 @@ with st.expander("Правовая основа (кратко)"):
 
 today = date.today()
 col1, col2 = st.columns(2)
-with col
+with col1:
+    birth = st.date_input(
+        "Дата рождения",
+        value=date(1990, 1, 1),
+        min_value=MIN_BIRTH,
+        max_value=MAX_BIRTH,
+        format="DD.MM.YYYY",   # если старая версия Streamlit — удалите этот параметр
+        key="birth_v4",
+    )
+with col2:
+    issue = st.date_input(
+        "Дата выдачи текущего паспорта",
+        value=date(2010, 1, 1),
+        min_value=MIN_ISSUE,
+        max_value=MAX_ISSUE,
+        format="DD.MM.YYYY",
+        key="issue_v4",
+    )
+
+if st.button("Рассчитать"):
+    errors = validate_inputs(birth, issue, today)
+    for e in errors:
+        st.error(e)
+
+    if not errors:
+        age_years = relativedelta(today, birth).years
+        st.subheader("Результаты")
+        st.write(f"**Возраст (полных лет):** {age_years}")
+
+        res = compute_status(birth, issue, today)
+        st.write(f"**Текущий документ получен как:** {res['stage_label']}")
+
+        if res["next_change"]:
+            st.write(f"**Дата обязательной замены:** {res['next_change'].strftime('%d.%m.%Y')}")
+            st.write(f"**Крайний срок (90 дней после ДР):** {res['deadline'].strftime('%d.%m.%Y')}")
+
+        # ---- Статус ----
+        if res["status_kind"] == "invalid":
+            st.error("Паспорт недействителен. Требуется замена.")
+        elif res["status_kind"] == "due":
+            st.warning(f"Требуется замена. До крайнего срока осталось {res['days_left']} дн.")
+        elif res["status_kind"] == "ok":
+            st.success(f"Паспорт действителен. До даты замены осталось {res['days_left']} дн.")
+        elif res["status_kind"] == "no_more":
+            st.info("Возрастных замен больше нет.")
