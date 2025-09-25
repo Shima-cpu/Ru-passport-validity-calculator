@@ -99,9 +99,9 @@ with st.expander("Правовая основа (кратко)"):
 today = date.today()
 col1, col2 = st.columns(2)
 with col1:
-    birth = st.date_input("Дата рождения", value=date(1990, 1, 1), format="DD.MM.YYYY")
+    birth = st.date_input("Дата рождения", value=date(1900, 1, 1), format="DD.MM.YYYY")
 with col2:
-    issue = st.date_input("Дата выдачи текущего паспорта", value=date(2010, 1, 1), format="DD.MM.YYYY")
+    issue = st.date_input("Дата выдачи текущего паспорта", value=date(2025, 1, 1), format="DD.MM.YYYY")
 
 if st.button("Рассчитать"):
     errors = validate_inputs(birth, issue, today)
@@ -135,4 +135,3 @@ if st.button("Рассчитать"):
                        "но возраст уже 45+. Вероятно, документ должен был быть заменён в 45 лет.")
 
 st.markdown("---")
-st.caption("Автор: Andrei @ RM Workspace • Готово к деплою на Streamlit Community Cloud.")
